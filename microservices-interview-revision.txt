@@ -1,0 +1,183 @@
+what are microservices?
+MicroServices are the services which are exposed by Rest , cloud enabled  and small deployable units with very well chosen boundaries.
+
+Challenges for building  microservices?
+1.Identifying the boundary for microservces.
+2.Configuration
+3.Scaling up of microservices
+4.distributing the load amoung the instances.
+5. Finding the exact error.
+
+
+Advantages of microservices architecture
+1.each microservies can be build in different languages.
+2.dynamic scaling
+3.faster releasing of functionality
+
+Centralised Configuartion for micrpservices --- Spring CLoud Config Server.
+
+How to enable Spring Cloud Config server?
+By Adding @EnableConfigServer annotation in main class
+
+How to connect to git from spring cloud config server?
+By Adding spring.cloud.config.server.git.uri={{git  repository url}} in application.properties
+
+How to connect to spring cloud config server from another microservice
+By Adding spring.cloud.config.uri={{config server url with port}} used 8888 as port.
+
+Feign
+-----
+what is FeignClient?
+Feign is used to call other microservices i.e it serves the purpose of communicating between the micro services.
+
+How to enable feign in our microservice?
+@EnableFeignClients("package name that needs to be scanned") on top of main Application
+
+How to communicate using Feign?
+Create a Proxy service to connect to another microservice annotate it with @FeignClient specify the microservice name that needs to be called and url and add the method as shown below
+
+@FeignClient(name="currency-exchange-service" , url="localhost:8000")
+public interface CurencyExchangeServiceProxy {
+
+	@GetMapping("/currency-exchange/from/{from}/to/{to}")
+	public CurrenyConverter retrieveExchangeValue(@PathVariable String from, @PathVariable String to);
+}
+
+Ribbon
+-----
+What is Ribbon why is it used?
+Ribbon is used  to distribute the load between the different instances of the micro servicesi.e it serves as a Load Balancer for microservices.
+
+How to enable Ribbon on clients?
+By Anotating with @RibbonClient(with service name which needs to be called) on proxy class as shown below
+
+@FeignClient(name="currency-exchange-service" )
+@RibbonClient(name="currency-exchange-service")
+public interface CurencyExchangeServiceProxy {
+	@GetMapping("/currency-exchange/from/{from}/to/{to}")
+	public CurrenyConverter retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
+
+}
+
+Add the below property in application.properties for the instances to be invoked.
+currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001 add this property in application.properties
+
+Eureka Naming Server
+-------------------
+Why we require Naming serveri.e(Eureka Server)?
+When we scale up the instances of microservice we need to add the new instance hostname and port and make changes in the client microservice configuration that is impossible if we have more number of microservices
+
+Eureka Naming Server is used for Service Registration of all microservices and Service Discovery of the particular micro service that is invoked.
+
+Create a spring Boot Project with Eureka Server, dev tools, actuator and Config Client dependencies and add @EnableEurekaServer annotaion on top of main application
+
+Add Eureka-starter-client dependency to all the microservices which needs to be registered with the EurekaNaming Server and add @EnableDiscoveryClient annotation on top of main class.
+Add eureka.client.service-url.default-zone=http://localhost:8761/Eureka
+
+
+Api-Gateways
+-----------
+Need for APi Gateway?
+When one microservice calls another microservice there are some common things that needs to be done and those are AUthentication,Authorization,Security,Fault tolerance,Rate Limits and Service Aggregation these can be acheived using apigateway
+As APi Gateways is an  entry point for a microservice we can perform debugging  ,Analytics  and so on..
+
+Zuul-ApiGateway
+---------------
+How to create Zuul Server?
+Create Spring Boot project with zuul,eureka discovery,devtools and actuator dependencies
+Add @EnableZuulProxy annotation on main class 
+Add @EnableDiscoveryClient annotation on main class to register it with Eureka Server
+
+How to implement Logging in Zuul APiGateway?
+-------------------------------------------
+Create a class that extends ZuulFilter in zuul-api-gateway-service as shown below
+
+public class ZuulLoggingFilter extends ZuulFilter {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Override
+	public boolean shouldFilter() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public Object run() throws ZuulException {
+		// TODO Auto-generated method stub
+		HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+		logger.info("request -> {} request uri ->{})", request, request.getRequestURI());
+		return null;
+	}
+
+	@Override
+	public String filterType() {
+		// TODO Auto-generated method stub
+		return "pre";
+	}
+
+	@Override
+	public int filterOrder() {
+		// TODO Auto-generated method stub
+		return 1;
+	}
+
+}
+
+How  one microservice call another microservice via Zuul serveri.e intercepting?
+-------------------------------------------------------------------------------
+Add @FeignClient({zuul service name}) on top of Proxy service and add{servcice-name} to the endpoint which calls another microservice as shown below
+
+//@FeignClient(name="currency-exchange-service" )
+@FeignClient(name="netflix-zuul-api-gateway-server" )
+@RibbonClient(name="currency-exchange-service")
+public interface CurencyExchangeServiceProxy {
+
+//	@GetMapping("/currency-exchange/from/{from}/to/{to}")
+	@GetMapping("/currency-exchange-service/currency-exchange/from/{from}/to/{to}")
+	public CurrenyConverter retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
+}
+
+Distributed Tracing
+-------------------
+For one particular Request there would be n number of  microservices talking to each other so if any  1 of the microservice doesn't return the expected response  how do we identify which microservice is the odd one .so in order to debug each and every microservice there is a need for distributed tracing.
+distributed tracing is performed by assigning a unique id for each request by spring cloud sleuth and adding them to the zipkin server via any messaging queue.
+
+Spring Cloud Sleuth
+-------------------
+Use of Spring CLOud Sleuth?
+---------------------------
+Spring cloud Sleuth is used to assign a unique id to all the incoming requests that pass through the chain of microservices which makes debugging easy to identify the tracing of each and every microservice
+
+how to add cloud sleuth to th project?
+Add the below dependency  in pom.xml and add the below code in main application
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+			<version>2.2.2.RELEASE</version>
+		</dependency>
+
+
+@Bean
+	public Sampler defaultSampler() {		
+		return Sampler.ALWAYS_SAMPLE;
+	}
+
+how spring cloud sleuth puts message?
+spring cloud sleuth connects and puts message on  rabbitmq queue which is listened by zipkin server.
+Add below dependencies in pom.xml
+<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-sleuth-zipkin -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
+			<version>2.2.2.RELEASE</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-bus-amqp -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+			<version>2.2.1.RELEASE</version>
+		</dependency>
+
+Spring CLoud bus is used to collect streaming data from each microservice and calls event to propogate that data
