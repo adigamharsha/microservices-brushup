@@ -1,0 +1,108 @@
+1.What is Angular?
+Angular is a javascript UI binding Framework which helps us to bind View with the Model.
+Angular helps us to create SPA using routing concept.
+Angular helps us to create MVC,MVVM and MVW architecture in the browser.
+
+2.Differences between AngularJS and Angular?
+1.Angular uses Components that loads view , css and Model. 2. Mobile compliant 3. ANgular has CLI. 4. Lazy loading 5. written in Typescript.
+1.AngularJS loads view first and then controller is loaded. 2. written in javascript.
+
+3.What are the directives in Angular?
+Directives are used to apply behaviour to the HTML DOM.
+Directives are the Angular syntaxes in the view.
+eg- [(ngModel)] , [hidden] , {{}} , (click)
+
+4.What are the types of directives?
+there are 3 types of directives in Angular(SAC)
+1.Structural Directives - This directive changes the structure of the DOM eg-ngFor
+2.Attribute Directives - This directive does not change the structure but changes behaviour hides eg-ngIf , [hidden]
+3.Component Directives - this directive is used to add user defined component in DOM eg-<component tag>
+
+5.what is npm and node_modules?
+npm is node package manager which helps us to install any java script libraries or packages.
+node_modules is the diectory in which all the packages are installed.
+
+6.what is the use of package.json file?
+package.json file lists out all the javascript libraries that we use in the project
+
+7.what is typescript?
+TypeScript is a superset of javascript .Typescript is a language that adds types to javascript.typescript compiles and it is converted into javascript.
+
+8.what is angular cli?
+angular cli is used to create readymade template for creating angular projects.
+
+9.What is Component and Module?
+A Component binds the view with the Model and CSS.
+A group of components are grouped to form a module.
+
+10.what is decorator?
+A Decorator says to Angular what kind of class is this
+eg: @Component , @NgModule
+
+11.what is databinding?
+databinding defines how the view communicates with the component. there are 4 types of databinding
+1.{{}} -> String interpolation
+2.[ ] -> property binding -- data flows from component  to view.
+3.() -> event binding -- any events are clicked the data flows from view to component.
+4.[(ngModel)] ->two way data binding
+
+12.Architecture or Building blocks of Angular?
+1.Template - view or HTML of Angular.
+2.Component 
+3.Module - Group of components
+4.directives - to add behaviour to tht HTML eg-ngFor , [hidden] , <component-directive>
+5.bindings - event binding () -> from HTML to Component , Property Binding [] -> from component to view , [(ngModel)] - > Two way binding
+6.services - th share common logic among the components.
+7.Dependency injection - to inject services via constructor in components.
+
+13.what is SPA?
+SPA stands for SIngle Page Application
+Single page Application are the applications where the main UI is loaded only once and then the needed UI is loaded on demand.
+
+14.What is Routing?
+Routing helps you to define navigation in Angular.
+Routing is a collection of url and respective component to be loaded when url id called.
+Routing is needed to implement SPA.
+
+ 15.How to implement Routing?
+ Add Router Collection with url and exact component for that route.
+ Add <router-outlet> </router-outlet> in the main component to define navigation.
+ Add [routerLink]=['Home']
+
+ 16.how to become routing from component? 
+ route.navigate(['/Home'])
+
+ 17.Lazy Loading in Angular?
+ Lazy Loading is acheived using modules
+ Divide the project into separate modules and load the children in routes collection by using routeChildren
+
+ 18.What are services in Angular?
+ Services helps you to share common logic in Angular.
+
+ 19.what is dependency injection?
+ Dependency Injection is a design pattern in which angular injects classes into component.
+
+ 20.Use of dependency injection?
+ when changed in one place it will reflect it another places too.
+
+21.difference between ng serve and ng build?
+ng serve builds the application in the memory. it is preferred during the development.
+ng build builds the application on the disk and creates dist folder and places all the binaries in the dist folder.
+
+22. what is ng build --prod do?
+ng build --prod makes production ready applications it does minification and removes all the unnecessary code.
+
+23.
+
+
+
+
+
+
+
+
+
+
+
+
+
