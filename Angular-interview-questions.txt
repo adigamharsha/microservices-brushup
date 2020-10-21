@@ -92,7 +92,16 @@ ng build builds the application on the disk and creates dist folder and places a
 22. what is ng build --prod do?
 ng build --prod makes production ready applications it does minification and removes all the unnecessary code.
 
-23.
+23.Angular LifeCycle hooks
+ ----------------------
+ 1.ngOnChanges : This is called when a binded input property i.e @Input is changed.
+ 2.ngOnInit : This is called when a component is initialized.
+ 3.ngDoCheck : Called during every change detection
+ 4.ngAfterContentInit : Called after ng-content has been projected in to the view.
+ 5.ngAfterCOntentChecked : Called every time when ng-content is checked.
+ 6.ngAfterViewInit : Called after view and it's child views are initialized.
+ 7.ngAfterViewChecked : Called every time when view and it's child views are checked.
+ 8.ngOnDestroy
 
 
 
