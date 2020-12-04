@@ -1,0 +1,97 @@
+Spring Security
+---------------
+1.When a request is made before hitting the Dispatcher Servlet the request is intercepted by DelegatingFilterProxy which passes the request to FilterChainProxy here it is passed to required Filter i.eAUthentication Filter, Authorization Filter , Remember me Filter
+
+2.Types of Filters
+----------------
+SecurityContextPersistentFilter
+LogoutFilter
+AUthenticationFilter
+RemembermeFilter
+ExceptionTranslationFilter
+FilterSecurityInterceptor
+
+3 .Authentication mechanism
+-------------------------
+Use Case1: When user is trying to access unsecured resource without providing credentials
+-----------------------------------------------------------------------------------------
+1.DelegatingFilterProxy delegates the request to FilterChainProxy and delegates to SecurityContextPersistentFilter.
+2.SecurityContextPersistentFilter checks if there is SecurityContext created and creates an empty SecurityContext as it doesnot provide credentials and store it in Security Context Holder and it is stored in Session.
+3.LogOutFilter does nothing as it is not logout request.
+4.AUthenticationFilter does nothing as it is not a AUthentication Request.
+5.Rememberme Filter does nothing as it doesnot provide remember me cookie inside the header.
+6.ExceptionTranslationFilter does nothing as no exception is thrown.
+7.FilterSecurityInterceptor does nothing as the request is to access unsecured resource.
+
+
+Use Case2: When user is trying to access secured resource without providing credentials
+---------------------------------------------------------------------------------------
+1.DelegatingFilterProxy delegates the request to FilterChainProxy and delegates to SecurityContextPersistentFilter.
+2.SecurityContextPersistentFilter checks if there is SecurityContext created and creates an empty SecurityContext as it doesnot provide credentials and store it in Security Context Holder and it is stored in Session.
+3.LogOutFilter does nothing as it is not logout request.
+4.AUthenticationFilter does nothing as it is not a AUthentication Request.
+5.Rememberme Filter does nothing as it doesnot provide remember me cookie inside the header.
+6.ExceptionTranslationFilter does nothing as no exception is thrown.
+7.FilterSecurityInterceptor throws AuthentionException to the ExceptionTranslationFilter.
+8.ExceptionTranslationFilter delegates the Exception to the appropriate Entrypoint i.e to the login entry point.
+
+Use Case3: When user is trying to access unsecured resource with providing credentials
+--------------------------------------------------------------------------------------
+1.DelegatingFilterProxy delegates the request to FilterChainProxy and delegates to SecurityContextPersistentFilter.
+2.SecurityContextPersistentFilter checks if there is SecurityContext created and creates an empty SecurityContext as it doesnot provide credentials and store it in Security Context Holder and it is stored in Session.
+3.LogOutFilter does nothing as it is not logout request.
+4.AUthenticationFilter creates Authention Request Object with credentials,isAuthentiated fields and delegates the request to AuthenticationManager here Authentication Manager picks up the appropriate AUthentication Manager Provider based on the authentication mechanismi.e(InMemory or database etc) here it calls Userdetailsdervice to get the user info and authenticates and return Principal Object with Authorities  attached to Authentication Object.
+5.Rememberme Filter does nothing as it doesnot provide remember me cookie inside the header.
+6.ExceptionTranslationFilter does nothing as no exception is thrown.
+7.FilterSecurityInterceptor does nothing as the request is to access unsecured resource.
+8.Here the returned AUthentication Object with Principal and authority is stored in Security Context and ThreadLocal is placed in Session.
+
+Use Case4: When  the Authenticated user is trying to access unsecured resource i.e trying to access Admin related resources
+---------------------------------------------------------------------------------------------------------------------------
+1.DelegatingFilterProxy delegates the request to FilterChainProxy and delegates to SecurityContextPersistentFilter.
+2.SecurityContextPersistentFilter checks if there is SecurityContext created and creates an empty SecurityContext as it doesnot provide credentials and store it in Security Context Holder and it is stored in Session.
+3.LogOutFilter does nothing as it is not logout request.
+4.AUthenticationFilter does nothing as it is not a AUthentication Request.
+5.Rememberme Filter does nothing as it doesnot provide remember me cookie inside the header.
+6.ExceptionTranslationFilter does nothing as no exception is thrown.
+7.FilterSecurityInterceptor throws UnAuthorizedException to the ExceptionTranslationFilter.
+8.ExceptionTranslationFilter delegates the Exception to the appropriate Entrypoint i.e and shows error page with Unauthorized to access page.
+
+OAuth2
+------
+OAuth2 is a protocol that allows user to grant limited access to their resources on one site to another site without having to expose their credentials.
+
+Grant Types in OAUth
+--------------------
+1.Authorization Code grant
+2.Client Credentails Grant Type
+3.Resource Owner password Grant Type.
+4.Implicit Grant Type
+
+1.Authorization Code Grant Type
+-------------------------------
+1.CLient Application needs to Register with the Auth Server by providing Redirect Url of Success Authentication and Client Scope of the OAUth Provideri.e(Google or Facebook).
+2.Auth Server provides CLient Id and Secret Key to the CLient Application.
+3.When User Clicks on Login with with Google the request goes to the User to enter crdentials of the Google Signin Page.
+4.Google Provides COnsent Page i.e the Scopes to be viewed and User accepts by clicking ok.
+5.Google Auth Server Generate Unique Auth Code and and tag it to the Client Id which was registered.
+6.Auth Code is returned to the Client and delegated with the redirect url.
+7.Client requests for access token to the Auth Server with the Auth Code, CLient Id and CLient Secret Key.
+8.Access Token is received by the Client.
+9.Using Access Token it request's Resource Server for the profile.
+10.Resource Server validates the Access Token by calling the Auth Server.
+11.Auth Server returns json with scopes and profile info.
+12.Profile is returned to the client.
+13.Here if the CLient App is Spring Security App it creates the Principal Object with grant types and store it in Security Context and Security Context in Session.
+
+
+
+
+
+
+
+
+
+
+
+
