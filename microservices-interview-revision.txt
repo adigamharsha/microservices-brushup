@@ -5,7 +5,7 @@ Challenges for building  microservices?
 1.Identifying the boundary for microservces.
 2.Configuration
 3.Scaling up of microservices
-4.distributing the load amoung the instances.
+4.distributing the load among the instances.
 5. Finding the exact error.
 
 
